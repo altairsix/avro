@@ -50,6 +50,7 @@ func TestEncodeDecode(t *testing.T) {
 	buf := bytes.NewBuffer(nil)
 	err := avro.NewEncoder(schema, buf).Encode(expected)
 	assert.Nil(t, err)
+	assert.Equal(t, len(buf.Bytes()), 19)
 
 	actual := &Sample{}
 	err = avro.NewDecoder(schema, buf).Decode(actual)
