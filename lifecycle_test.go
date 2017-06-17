@@ -35,9 +35,15 @@ const (
 )
 
 type Sample struct {
-	Username  string `json:"username"`
-	Comment   string `json:"comment"`
-	Timestamp int64  `json:"timestamp"`
+	Username  string `json:"username,omitempty"`
+	Comment   string `json:"comment,omitempty"`
+	Timestamp int64  `json:"timestamp,omitempty"`
+}
+
+func TestEncodeVerifiesSchema(t *testing.T) {
+	sample := &Sample{Username: "username"}
+	err := avro.NewEncoder(schema, bytes.NewBuffer(nil)).Encode(sample)
+	assert.NotNil(t, err)
 }
 
 func TestEncodeDecode(t *testing.T) {
