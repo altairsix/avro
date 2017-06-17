@@ -8,14 +8,8 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
-type Sample struct {
-	Username  string `json:"username"`
-	Comment   string `json:"comment"`
-	Timestamp int64  `json:"timestamp"`
-}
-
-func TestEncodeDecode(t *testing.T) {
-	schema := `{
+const (
+	schema = `{
   "type": "record",
   "name": "comments",
   "doc:": "A basic schema for storing blog comments",
@@ -38,7 +32,15 @@ func TestEncodeDecode(t *testing.T) {
     }
   ]
 }`
+)
 
+type Sample struct {
+	Username  string `json:"username"`
+	Comment   string `json:"comment"`
+	Timestamp int64  `json:"timestamp"`
+}
+
+func TestEncodeDecode(t *testing.T) {
 	expected := &Sample{
 		Username:  "username",
 		Comment:   "comment",
@@ -54,4 +56,19 @@ func TestEncodeDecode(t *testing.T) {
 	assert.Nil(t, err)
 
 	assert.Equal(t, expected, actual)
+}
+
+func BenchmarkEncoder_Encode(b *testing.B) {
+	sample := &Sample{
+		Username:  "username",
+		Comment:   "comment",
+		Timestamp: 123,
+	}
+
+	buf := bytes.NewBuffer(nil)
+	for i := 0; i < b.N; i++ {
+		err := avro.NewEncoder(schema, buf).Encode(sample)
+		assert.Nil(b, err)
+		buf.Truncate(0)
+	}
 }
